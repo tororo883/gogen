@@ -1,8 +1,7 @@
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AnkiEtym - 語源連動型フラッシュカード</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AnkiEtym - 語源フラッシュカード</title>
 
@@ -17,396 +16,282 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231e293b'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%2338bdf8'>🧩</text></svg>">
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231e293b'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%2338bdf8'>🧩</text></svg>">
 
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-body {
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-background-color: #121212;
-color: #e0e0e0;
-user-select: none;
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      user-select: none;
       -webkit-tap-highlight-color: transparent;
       overscroll-behavior-y: none;
-}
-    /* AnkiDroid風のアニメーションとスクロール調整 */
-.fade-in {
-      animation: fadeIn 0.25s ease-out forwards;
+    }
+    .fade-in {
       animation: fadeIn 0.22s ease-out forwards;
-}
-@keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+    }
+    @keyframes fadeIn {
       from { opacity: 0; transform: translateY(6px); }
-to { opacity: 1; transform: translateY(0); }
-}
-</style>
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body class="flex justify-center items-center min-h-screen p-0 sm:p-4">
 
-  <!-- スマホサイズコンテナ (AnkiDroid風) -->
-  <div class="w-full max-w-md h-screen sm:h-[840px] bg-[#1e1e1e] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-neutral-800">
   <!-- スマホサイズコンテナ -->
   <div class="w-full max-w-md h-[100dvh] sm:h-[840px] bg-[#1e1e1e] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-neutral-800">
 
-    <!-- 1. AnkiDroid風 トップアプリバー -->
-    <header class="bg-[#2c2c2c] px-4 py-3 flex items-center justify-between border-b border-neutral-700 shrink-0">
-      <div class="flex items-center gap-3">
-        <span class="font-bold text-base tracking-wide text-neutral-100">英単語・語源デッキ</span>
     <!-- 1. トップアプリバー（語根ファミリー・ボーナスバーは削除してスッキリ化） -->
     <header class="bg-[#282828] px-4 py-3 flex items-center justify-between border-b border-neutral-700 shrink-0">
       <div class="flex items-center gap-2">
         <span class="text-lg">🧩</span>
         <span class="font-bold text-base tracking-wide text-neutral-100">AnkiEtym</span>
-</div>
-
-      <!-- 残りカードカウント (青:新規 / 赤:学習中 / 緑:復習) -->
-      <div class="flex items-center gap-3 text-sm font-mono font-bold">
-        <div class="flex gap-2 bg-[#1e1e1e] px-3 py-1 rounded-md border border-neutral-700">
-          <span id="count-new" class="text-blue-400 underline">3</span>
-          <span id="count-learn" class="text-red-400">1</span>
-          <span id="count-review" class="text-green-400">2</span>
+      </div>
+      
       <!-- 残りカードカウント & 初期化ボタン -->
       <div class="flex items-center gap-2.5 text-xs font-mono font-bold">
         <div class="flex gap-2.5 bg-[#161616] px-3 py-1.5 rounded-lg border border-neutral-700 text-sm">
           <span id="count-new" class="text-sky-400 underline">3</span>
           <span id="count-learn" class="text-rose-400">1</span>
           <span id="count-review" class="text-emerald-400">2</span>
-</div>
-        <button onclick="resetAll()" title="進捗をリセット" class="text-xs text-neutral-400 hover:text-white px-2 py-1 rounded bg-neutral-800">
-          リセット
+        </div>
         <button onclick="resetAll()" title="学習履歴をリセット" class="text-xs text-neutral-300 hover:text-white px-2.5 py-1.5 rounded-lg bg-neutral-700 active:scale-95 transition">
           初期化
-</button>
-</div>
-</header>
-
-    <!-- 語根シナジー・ステータスバー (独自改良機能) -->
-    <div class="bg-[#252525] px-4 py-1.5 flex items-center justify-between text-xs border-b border-neutral-800 shrink-0">
-      <div class="flex items-center gap-2">
-        <span class="text-neutral-400">現在の語根ファミリー:</span>
-        <span id="current-root-badge" class="font-semibold text-amber-300 bg-amber-950/60 border border-amber-700/50 px-2 py-0.5 rounded">
-          spect (見る)
-        </span>
+        </button>
       </div>
-      <div class="flex items-center gap-1">
-        <span class="text-neutral-400">語根ボーナス:</span>
-        <span id="root-bonus-text" class="font-mono font-bold text-emerald-400">+0%</span>
-      </div>
-    </div>
+    </header>
 
-    <!-- 2. メインカード領域 (スクロール可能) -->
-    <main id="card-content" class="flex-1 overflow-y-auto px-5 py-6 space-y-6">
     <!-- 2. メインカード領域 -->
     <main id="card-content" class="flex-1 overflow-y-auto px-5 py-6 space-y-5">
-
-<!-- 【表面：常に表示】単語と英語例文 -->
-      <section class="text-center space-y-4">
+      
+      <!-- 【表面：常に表示】単語と英語例文 -->
       <section class="text-center space-y-3">
-<div class="flex items-center justify-center gap-2">
-          <span id="word-pos" class="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-neutral-700 text-neutral-300">
+        <div class="flex items-center justify-center gap-2">
           <span id="word-pos" class="text-xs font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded bg-neutral-700 text-neutral-200">
-動詞
-</span>
-          <span id="card-status-badge" class="text-xs px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">
+            動詞
+          </span>
           <span id="card-status-badge" class="text-xs px-2.5 py-0.5 rounded font-medium bg-sky-950 text-sky-300 border border-sky-800">
-新規カード
-</span>
-</div>
+            新規カード
+          </span>
+        </div>
 
-<!-- 英単語 & 発音ボタン -->
-        <div class="flex items-center justify-center gap-3">
+        <!-- 英単語 & 発音ボタン -->
         <div class="flex items-center justify-center gap-3 pt-1">
-<h1 id="word-text" class="text-4xl font-extrabold tracking-tight text-white">
-inspect
-</h1>
-          <button onclick="speakWord()" title="発音を聞く" class="p-2 rounded-full bg-neutral-800 hover:bg-neutral-700 text-blue-400 active:scale-95 transition">
+          <h1 id="word-text" class="text-4xl font-extrabold tracking-tight text-white">
+            inspect
+          </h1>
           <button onclick="speakWord()" title="発音を聞く" class="p-2.5 rounded-full bg-neutral-800 hover:bg-neutral-700 text-sky-400 active:scale-90 transition border border-neutral-700">
-🔊
-</button>
-</div>
+            🔊
+          </button>
+        </div>
 
-<p id="word-phonetic" class="text-sm text-neutral-400 font-mono">/ɪnˈspekt/</p>
+        <p id="word-phonetic" class="text-sm text-neutral-400 font-mono">/ɪnˈspekt/</p>
 
-<!-- 英語例文ボックス -->
-        <div class="bg-[#262626] p-4 rounded-xl border border-neutral-800 text-left mt-4">
-          <p class="text-xs text-neutral-400 mb-1 font-semibold">例文</p>
-          <p id="sentence-en" class="text-base text-neutral-200 leading-relaxed">
+        <!-- 英語例文ボックス -->
         <div class="bg-[#262626] p-4 rounded-xl border border-neutral-700/80 text-left mt-3 shadow-inner">
           <p class="text-[11px] text-neutral-400 mb-1 font-semibold">例文</p>
           <p id="sentence-en" class="text-base text-neutral-100 leading-relaxed">
-Customs officers <span class="text-amber-400 font-bold underline underline-offset-4">inspected</span> the cargo carefully.
-</p>
-</div>
-</section>
+            Customs officers <span class="text-amber-400 font-bold underline underline-offset-4">inspected</span> the cargo carefully.
+          </p>
+        </div>
+      </section>
 
-<!-- 【裏面：解答表示タップ後に展開】 -->
-      <section id="answer-section" class="hidden space-y-5 fade-in">
-        <!-- Anki風の区切り線 -->
+      <!-- 【裏面：解答表示タップ後に展開】 -->
       <section id="answer-section" class="hidden space-y-4 fade-in">
-<hr class="border-neutral-700" />
+        <hr class="border-neutral-700" />
 
-<!-- ① 単語の意味と例文の和訳 -->
-<div class="space-y-3 text-center">
-          <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
+        <!-- ① 単語の意味と例文の和訳 -->
+        <div class="space-y-3 text-center">
           <h2 id="word-meaning" class="text-xl sm:text-2xl font-bold text-emerald-400">
-〜を検査する、調査する、視察する
-</h2>
-          <div class="bg-[#262626]/70 p-3.5 rounded-xl border border-neutral-800/80 text-left">
-            <p class="text-xs text-neutral-400 mb-1">例文の訳</p>
-            <p id="sentence-ja" class="text-sm text-neutral-300 leading-relaxed">
+            〜を検査する、調査する、視察する
+          </h2>
           <div class="bg-[#262626]/90 p-3.5 rounded-xl border border-neutral-700/70 text-left">
             <p class="text-[11px] text-neutral-400 mb-1">例文の訳</p>
             <p id="sentence-ja" class="text-sm text-neutral-200 leading-relaxed">
-税関職員は貨物を注意深く<span class="text-emerald-400 font-bold">検査した</span>。
-</p>
-</div>
-</div>
+              税関職員は貨物を注意深く<span class="text-emerald-400 font-bold">検査した</span>。
+            </p>
+          </div>
+        </div>
 
-        <!-- ② 改良機能：語源（Etymology）分解パネル -->
-        <div class="bg-[#19222b] border border-sky-900/60 rounded-xl p-4 space-y-4">
         <!-- ② 語源（Etymology）分解パネル -->
         <div class="bg-[#19232d] border border-sky-800/70 rounded-xl p-4 space-y-3.5 shadow-md">
-<div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1">
-              🧩 語源パーツ分解 (Etymology)
+          <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-sky-300">
               🧩 語源パーツ分解
-</span>
-            <span class="text-[11px] text-neutral-400">色分け：接頭辞 / 語根 / 接尾辞</span>
+            </span>
             <span class="text-[11px] text-neutral-400">接頭辞 / 語根 / 接尾辞</span>
-</div>
-
-<!-- パーツの視覚的ブロック -->
-          <div id="etymology-parts" class="flex flex-wrap items-center justify-center gap-2 py-1">
-            <!-- JSで動的生成 -->
           </div>
+
+          <!-- パーツの視覚的ブロック -->
           <div id="etymology-parts" class="flex flex-wrap items-center justify-center gap-2 py-1"></div>
 
-<!-- コアイメージ解説 -->
-          <div class="bg-[#121820] p-3 rounded-lg border border-sky-950 text-sm">
+          <!-- コアイメージ解説 -->
           <div class="bg-[#111820] p-3.5 rounded-lg border border-sky-900/80 text-sm">
-<span class="text-xs text-sky-300 font-bold block mb-1">💡 コアイメージ・成り立ち</span>
-            <p id="etymology-note" class="text-neutral-200 leading-relaxed">
-              「中（in）をじっと見る（spect）」→ 細部まで目を通して「検査する・調査する」という意味になります。
-            </p>
+            <span class="text-xs text-sky-300 font-bold block mb-1">💡 コアイメージ・成り立ち</span>
             <p id="etymology-note" class="text-neutral-100 leading-relaxed text-xs sm:text-sm"></p>
-</div>
+          </div>
 
-<!-- 同じ語根を持つ関連語ネットワーク -->
-<div>
-            <span class="text-xs text-neutral-400 block mb-2">
-              🔗 同じ語根 <strong id="family-root-name" class="text-amber-300">spect (見る)</strong> を持つファミリー単語：
+          <!-- 同じ語根を持つ関連語ネットワーク -->
+          <div>
             <span class="text-xs text-neutral-300 block mb-2">
               🔗 同じ語根 <strong id="family-root-name" class="text-amber-300"></strong> の関連語：
-</span>
-            <div id="related-words" class="flex flex-wrap gap-2">
-              <!-- JSで動的生成 -->
-            </div>
+            </span>
             <div id="related-words" class="flex flex-wrap gap-1.5"></div>
-</div>
-</div>
-
-        <!-- カードの現在のアルゴリズム内部パラメータ表示 (検証用) -->
-        <div class="text-[11px] text-neutral-500 font-mono flex justify-between px-1">
-          <span id="debug-params">Interval: 0d | Ease: 2.50 | Reps: 0</span>
-          <span>SM-2 + 語根シナジー補正</span>
+          </div>
         </div>
-</section>
+      </section>
 
-</main>
+    </main>
 
-    <!-- 3. ボトムアクションバー (AnkiDroid風) -->
-    <footer class="bg-[#2c2c2c] p-3 border-t border-neutral-700 shrink-0">
     <!-- 3. ボトムアクションバー（視認性を大幅に高めたカラーリング） -->
     <footer class="bg-[#242424] p-3 pb-6 sm:pb-4 border-t border-neutral-700 shrink-0">
-
-<!-- 状態A: 「解答を表示」ボタン -->
-      <button id="btn-show-answer" onclick="showAnswer()" class="w-full py-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-base rounded-xl shadow-lg transition">
+      
+      <!-- 状態A: 「解答を表示」ボタン -->
       <button id="btn-show-answer" onclick="showAnswer()" class="w-full py-4 bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white font-bold text-base rounded-xl shadow-lg transition tracking-wide">
-解答を表示
-</button>
+        解答を表示
+      </button>
 
-      <!-- 状態B: 4段階の理解度評価ボタン (解答表示後に切り替え) -->
       <!-- 状態B: 4段階の理解度評価ボタン（くっきり見やすい高コントラスト配色） -->
-<div id="grade-buttons" class="hidden grid grid-cols-4 gap-2">
-        <!-- 1: もう一度 (Again) -->
-        <button onclick="submitGrade(1)" class="flex flex-col items-center justify-center py-2.5 px-1 bg-red-950/80 hover:bg-red-900 border border-red-700/70 rounded-xl active:scale-95 transition">
-          <span id="interval-1" class="text-[11px] font-mono text-red-300 mb-0.5">&lt; 10分</span>
-          <span class="text-sm font-bold text-red-200">もう一度</span>
+      <div id="grade-buttons" class="hidden grid grid-cols-4 gap-2">
         <!-- 1: もう一度 (鮮やかなローズレッド) -->
         <button onclick="submitGrade(1)" class="flex flex-col items-center justify-center py-3 px-1 bg-rose-600 hover:bg-rose-500 active:bg-rose-700 border-b-4 border-rose-800 rounded-xl shadow-md active:scale-95 transition">
           <span id="interval-1" class="text-xs font-mono font-bold text-rose-100 mb-0.5">&lt; 10分</span>
           <span class="text-sm font-extrabold text-white">もう一度</span>
-</button>
+        </button>
 
-        <!-- 2: 難しい (Hard) -->
-        <button onclick="submitGrade(2)" class="flex flex-col items-center justify-center py-2.5 px-1 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-xl active:scale-95 transition">
-          <span id="interval-2" class="text-[11px] font-mono text-neutral-300 mb-0.5">1日</span>
-          <span class="text-sm font-bold text-neutral-200">難しい</span>
         <!-- 2: 難しい (視認性の高いアンバーオレンジ) -->
         <button onclick="submitGrade(2)" class="flex flex-col items-center justify-center py-3 px-1 bg-amber-600 hover:bg-amber-500 active:bg-amber-700 border-b-4 border-amber-800 rounded-xl shadow-md active:scale-95 transition">
           <span id="interval-2" class="text-xs font-mono font-bold text-amber-100 mb-0.5">1日</span>
           <span class="text-sm font-extrabold text-white">難しい</span>
-</button>
+        </button>
 
-        <!-- 3: 普通 (Good) -->
-        <button onclick="submitGrade(3)" class="flex flex-col items-center justify-center py-2.5 px-1 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/70 rounded-xl active:scale-95 transition">
-          <span id="interval-3" class="text-[11px] font-mono text-emerald-300 mb-0.5">3日</span>
-          <span class="text-sm font-bold text-emerald-200">普通</span>
         <!-- 3: 普通 (標準の鮮やかなエメラルドグリーン) -->
         <button onclick="submitGrade(3)" class="flex flex-col items-center justify-center py-3 px-1 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 border-b-4 border-emerald-800 rounded-xl shadow-md active:scale-95 transition">
           <span id="interval-3" class="text-xs font-mono font-bold text-emerald-100 mb-0.5">3日</span>
           <span class="text-sm font-extrabold text-white">普通</span>
-</button>
+        </button>
 
-        <!-- 4: 簡単 (Easy) -->
-        <button onclick="submitGrade(4)" class="flex flex-col items-center justify-center py-2.5 px-1 bg-sky-950/80 hover:bg-sky-900 border border-sky-700/70 rounded-xl active:scale-95 transition">
-          <span id="interval-4" class="text-[11px] font-mono text-sky-300 mb-0.5">7日</span>
-          <span class="text-sm font-bold text-sky-200">簡単</span>
         <!-- 4: 簡単 (爽快なスカイブルー) -->
         <button onclick="submitGrade(4)" class="flex flex-col items-center justify-center py-3 px-1 bg-sky-600 hover:bg-sky-500 active:bg-sky-700 border-b-4 border-sky-800 rounded-xl shadow-md active:scale-95 transition">
           <span id="interval-4" class="text-xs font-mono font-bold text-sky-100 mb-0.5">7日</span>
           <span class="text-sm font-extrabold text-white">簡単</span>
-</button>
-</div>
+        </button>
+      </div>
 
-</footer>
-</div>
+    </footer>
+  </div>
 
-<script>
-    // --- 1. 語源パーツ＆単語の初期データ ---
+  <script>
     const STORAGE_KEY = "anki_etym_save_v2";
 
-const initialCards = [
-{
-id: 1,
-@@ -205,17 +193,13 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-sentenceEn: "Customs officers <span class='text-amber-400 font-bold underline underline-offset-4'>inspected</span> the cargo carefully.",
-sentenceJa: "税関職員は貨物を注意深く<span class='text-emerald-400 font-bold'>検査した</span>。",
-rootKey: "spect",
-        rootMeaning: "見る (look / see)",
+    const initialCards = [
+      {
+        id: 1,
+        word: "inspect",
+        phonetic: "/ɪnˈspekt/",
+        pos: "動詞",
+        meaning: "〜を検査する、調査する、視察する",
+        sentenceEn: "Customs officers <span class='text-amber-400 font-bold underline underline-offset-4'>inspected</span> the cargo carefully.",
+        sentenceJa: "税関職員は貨物を注意深く<span class='text-emerald-400 font-bold'>検査した</span>。",
+        rootKey: "spect",
         rootMeaning: "見る (look)",
-parts: [
-{ text: "in-", type: "prefix", meaning: "中へ (into)" },
-{ text: "spect", type: "root", meaning: "見る (look)" }
-],
-etymologyNote: "「中（in）をじっと見る（spect）」→ 細部まで目を通して「検査する・調査する」という意味になります。",
-        // Anki SM-2 パラメータ
-        status: "new", // "new" | "learning" | "review"
-        interval: 0,
-        repetitions: 0,
-        easeFactor: 2.5
+        parts: [
+          { text: "in-", type: "prefix", meaning: "中へ (into)" },
+          { text: "spect", type: "root", meaning: "見る (look)" }
+        ],
+        etymologyNote: "「中（in）をじっと見る（spect）」→ 細部まで目を通して「検査する・調査する」という意味になります。",
         status: "new", interval: 0, repetitions: 0, easeFactor: 2.5
-},
-{
-id: 2,
-@@ -226,16 +210,13 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-sentenceEn: "There is little <span class='text-amber-400 font-bold underline underline-offset-4'>prospect</span> of reaching an agreement soon.",
-sentenceJa: "すぐに合意に達する<span class='text-emerald-400 font-bold'>見込み</span>はほとんどない。",
-rootKey: "spect",
-        rootMeaning: "見る (look / see)",
+      },
+      {
+        id: 2,
+        word: "prospect",
+        phonetic: "/ˈprɑːspekt/",
+        pos: "名詞",
+        meaning: "見込み、見通し、有望な人（見込み客）",
+        sentenceEn: "There is little <span class='text-amber-400 font-bold underline underline-offset-4'>prospect</span> of reaching an agreement soon.",
+        sentenceJa: "すぐに合意に達する<span class='text-emerald-400 font-bold'>見込み</span>はほとんどない。",
+        rootKey: "spect",
         rootMeaning: "見る (look)",
-parts: [
-{ text: "pro-", type: "prefix", meaning: "前へ (forward)" },
-{ text: "spect", type: "root", meaning: "見る (look)" }
-],
-etymologyNote: "「前（pro）を見る（spect）」→ 未来を見渡すことから「見通し・見込み・展望」という意味になります。",
-        status: "new",
-        interval: 0,
-        repetitions: 0,
-        easeFactor: 2.5
+        parts: [
+          { text: "pro-", type: "prefix", meaning: "前へ (forward)" },
+          { text: "spect", type: "root", meaning: "見る (look)" }
+        ],
+        etymologyNote: "「前（pro）を見る（spect）」→ 未来を見渡すことから「見通し・見込み・展望」という意味になります。",
         status: "new", interval: 0, repetitions: 0, easeFactor: 2.5
-},
-{
-id: 3,
-@@ -246,17 +227,14 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-sentenceEn: "She felt <span class='text-amber-400 font-bold underline underline-offset-4'>conspicuous</span> in her bright red coat.",
-sentenceJa: "彼女は真っ赤なコートを着て<span class='text-emerald-400 font-bold'>人目を引いている</span>と感じた。",
-rootKey: "spect",
-        rootMeaning: "見る (look / see)",
+      },
+      {
+        id: 3,
+        word: "conspicuous",
+        phonetic: "/kənˈspɪkjuəs/",
+        pos: "形容詞",
+        meaning: "人目を引く、目立つ、顕著な",
+        sentenceEn: "She felt <span class='text-amber-400 font-bold underline underline-offset-4'>conspicuous</span> in her bright red coat.",
+        sentenceJa: "彼女は真っ赤なコートを着て<span class='text-emerald-400 font-bold'>人目を引いている</span>と感じた。",
+        rootKey: "spect",
         rootMeaning: "見る (look)",
-parts: [
-          { text: "con-", type: "prefix", meaning: "強意・一緒に (altogether)" },
+        parts: [
           { text: "con-", type: "prefix", meaning: "強意・一緒に" },
-{ text: "spic(spect)", type: "root", meaning: "見る (look)" },
-          { text: "-uous", type: "suffix", meaning: "〜の性質を持つ (形容詞化)" }
+          { text: "spic(spect)", type: "root", meaning: "見る (look)" },
           { text: "-uous", type: "suffix", meaning: "形容詞化" }
-],
-etymologyNote: "「みんなから一斉に（con）見られる（spic=spect）状態（-uous）」→「いやでも目につく・目立つ」。",
-        status: "review",
-        interval: 4,
-        repetitions: 2,
-        easeFactor: 2.5
+        ],
+        etymologyNote: "「みんなから一斉に（con）見られる（spic=spect）状態（-uous）」→「いやでも目につく・目立つ」。",
         status: "review", interval: 4, repetitions: 2, easeFactor: 2.5
-},
-{
-id: 4,
-@@ -267,16 +245,13 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-sentenceEn: "They <span class='text-amber-400 font-bold underline underline-offset-4'>extract</span> essential oils from lavender flowers.",
-sentenceJa: "彼らはラベンダーの花からエッセンシャルオイルを<span class='text-emerald-400 font-bold'>抽出する</span>。",
-rootKey: "tract",
-        rootMeaning: "引く (draw / pull)",
+      },
+      {
+        id: 4,
+        word: "extract",
+        phonetic: "/ɪkˈstrækt/",
+        pos: "動詞",
+        meaning: "〜を抽出する、抜き出す、引き抜く",
+        sentenceEn: "They <span class='text-amber-400 font-bold underline underline-offset-4'>extract</span> essential oils from lavender flowers.",
+        sentenceJa: "彼らはラベンダーの花からエッセンシャルオイルを<span class='text-emerald-400 font-bold'>抽出する</span>。",
+        rootKey: "tract",
         rootMeaning: "引く (pull)",
-parts: [
-{ text: "ex-", type: "prefix", meaning: "外へ (out)" },
-{ text: "tract", type: "root", meaning: "引く (pull)" }
-],
-etymologyNote: "「中から外へ（ex）引っ張り出す（tract）」→ 歯を抜く、成分を「抽出する」、文章を「抜粋する」。",
-        status: "new",
-        interval: 0,
-        repetitions: 0,
-        easeFactor: 2.5
+        parts: [
+          { text: "ex-", type: "prefix", meaning: "外へ (out)" },
+          { text: "tract", type: "root", meaning: "引く (pull)" }
+        ],
+        etymologyNote: "「中から外へ（ex）引っ張り出す（tract）」→ 歯を抜く、成分を「抽出する」、文章を「抜粋する」。",
         status: "new", interval: 0, repetitions: 0, easeFactor: 2.5
-},
-{
-id: 5,
-@@ -287,16 +262,13 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-sentenceEn: "Don't let smartphone notifications <span class='text-amber-400 font-bold underline underline-offset-4'>distract</span> you from studying.",
-sentenceJa: "スマホの通知に勉強から<span class='text-emerald-400 font-bold'>気をそらされない</span>ようにしなさい。",
-rootKey: "tract",
-        rootMeaning: "引く (draw / pull)",
+      },
+      {
+        id: 5,
+        word: "distract",
+        phonetic: "/dɪˈstrækt/",
+        pos: "動詞",
+        meaning: "（注意・気）をそらす、散漫にする",
+        sentenceEn: "Don't let smartphone notifications <span class='text-amber-400 font-bold underline underline-offset-4'>distract</span> you from studying.",
+        sentenceJa: "スマホの通知に勉強から<span class='text-emerald-400 font-bold'>気をそらされない</span>ようにしなさい。",
+        rootKey: "tract",
         rootMeaning: "引く (pull)",
-parts: [
-          { text: "dis-", type: "prefix", meaning: "バラバラに・離れて (apart)" },
+        parts: [
           { text: "dis-", type: "prefix", meaning: "離れて (apart)" },
-{ text: "tract", type: "root", meaning: "引く (pull)" }
-],
-etymologyNote: "「集中していた意識を別方向へ引き離す（dis + tract）」→「気を散らす・注意をそらす」。",
-        status: "learning",
-        interval: 1,
-        repetitions: 1,
-        easeFactor: 2.35
+          { text: "tract", type: "root", meaning: "引く (pull)" }
+        ],
+        etymologyNote: "「集中していた意識を別方向へ引き離す（dis + tract）」→「気を散らす・注意をそらす」。",
         status: "learning", interval: 1, repetitions: 1, easeFactor: 2.35
-},
-{
-id: 6,
-@@ -307,30 +279,40 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-sentenceEn: "Metals <span class='text-amber-400 font-bold underline underline-offset-4'>contract</span> as they become cool.",
-sentenceJa: "金属は冷えるにつれて<span class='text-emerald-400 font-bold'>収縮する</span>。",
-rootKey: "tract",
-        rootMeaning: "引く (draw / pull)",
+      },
+      {
+        id: 6,
+        word: "contract",
+        phonetic: "/ˈkɑːntrækt/",
+        pos: "名詞 / 動詞",
+        meaning: "契約（を結ぶ）、収縮する",
+        sentenceEn: "Metals <span class='text-amber-400 font-bold underline underline-offset-4'>contract</span> as they become cool.",
+        sentenceJa: "金属は冷えるにつれて<span class='text-emerald-400 font-bold'>収縮する</span>。",
+        rootKey: "tract",
         rootMeaning: "引く (pull)",
-parts: [
-{ text: "con-", type: "prefix", meaning: "一緒に (together)" },
-{ text: "tract", type: "root", meaning: "引く (pull)" }
-],
-etymologyNote: "「お互いをギュッと引き寄せる（con + tract）」→ 二者間で結ぶ「契約」、または物理的に縮む「収縮する」。",
-        status: "review",
-        interval: 6,
-        repetitions: 2,
-        easeFactor: 2.6
+        parts: [
+          { text: "con-", type: "prefix", meaning: "一緒に (together)" },
+          { text: "tract", type: "root", meaning: "引く (pull)" }
+        ],
+        etymologyNote: "「お互いをギュッと引き寄せる（con + tract）」→ 二者間で結ぶ「契約」、または物理的に縮む「収縮する」。",
         status: "review", interval: 6, repetitions: 2, easeFactor: 2.6
-}
-];
+      }
+    ];
 
-    let cards = JSON.parse(JSON.stringify(initialCards));
     let cards = [];
-let currentIndex = 0;
-    // 語根ごとの習熟ボーナス (正解するごとに上昇)
-    let rootMastery = {
-      spect: 0.0,
-      tract: 0.0
-    };
+    let currentIndex = 0;
 
-    // --- 2. 改良版 SM-2 アルゴリズム計算 ---
     function loadProgress() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -427,210 +312,160 @@ let currentIndex = 0;
       } catch (e) {}
     }
 
-function simulateNextInterval(card, grade) {
-      const bonus = rootMastery[card.rootKey] || 0;
-let { interval, repetitions, easeFactor } = card;
+    function simulateNextInterval(card, grade) {
+      let { interval, repetitions, easeFactor } = card;
 
-if (grade === 1) {
-@@ -340,13 +322,11 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-let nextDays = 1;
-if (repetitions === 0) {
-nextDays = grade === 2 ? 1 : grade === 3 ? 3 : 5;
-        nextDays = Math.round(nextDays * (1 + bonus));
-} else if (repetitions === 1) {
-        const base = grade === 2 ? 3 : grade === 3 ? 6 : 9;
-        nextDays = Math.round(base * (1 + bonus));
+      if (grade === 1) {
+        return { interval: 0, label: "< 10分", nextStatus: "learning", repetitions: 0, easeFactor: Math.max(1.3, easeFactor - 0.2) };
+      }
+
+      let nextDays = 1;
+      if (repetitions === 0) {
+        nextDays = grade === 2 ? 1 : grade === 3 ? 3 : 5;
+      } else if (repetitions === 1) {
         nextDays = grade === 2 ? 3 : grade === 3 ? 6 : 9;
-} else {
-const gradeMult = grade === 2 ? 1.2 : grade === 4 ? 1.3 : 1.0;
-        nextDays = Math.max(interval + 1, Math.round(interval * easeFactor * gradeMult * (1 + bonus * 0.5)));
+      } else {
+        const gradeMult = grade === 2 ? 1.2 : grade === 4 ? 1.3 : 1.0;
         nextDays = Math.max(interval + 1, Math.round(interval * easeFactor * gradeMult));
-}
+      }
 
-let newEF = easeFactor;
-@@ -362,114 +342,93 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-};
-}
+      let newEF = easeFactor;
+      if (grade === 2) newEF = Math.max(1.3, easeFactor - 0.15);
+      if (grade === 4) newEF = easeFactor + 0.15;
 
-    // --- 3. 画面描画ロジック ---
-function renderCard() {
-const card = cards[currentIndex];
+      return {
+        interval: nextDays,
+        label: `${nextDays}日`,
+        nextStatus: "review",
+        repetitions: repetitions + 1,
+        easeFactor: newEF
+      };
+    }
 
-      // カウント更新
-      const newCount = cards.filter(c => c.status === "new").length;
-      const learnCount = cards.filter(c => c.status === "learning").length;
-      const revCount = cards.filter(c => c.status === "review").length;
-      document.getElementById("count-new").textContent = newCount;
-      document.getElementById("count-learn").textContent = learnCount;
-      document.getElementById("count-review").textContent = revCount;
+    function renderCard() {
+      const card = cards[currentIndex];
 
-      // 語根ステータスバー更新
-      document.getElementById("current-root-badge").textContent = `${card.rootKey} (${card.rootMeaning})`;
-      const bonusPercent = Math.round((rootMastery[card.rootKey] || 0) * 100);
-      document.getElementById("root-bonus-text").textContent = `+${bonusPercent}%`;
       document.getElementById("count-new").textContent = cards.filter(c => c.status === "new").length;
       document.getElementById("count-learn").textContent = cards.filter(c => c.status === "learning").length;
       document.getElementById("count-review").textContent = cards.filter(c => c.status === "review").length;
 
-      // 表面の表示更新
-document.getElementById("word-pos").textContent = card.pos;
-const badgeEl = document.getElementById("card-status-badge");
-if (card.status === "new") {
-badgeEl.textContent = "新規カード";
-        badgeEl.className = "text-xs px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800";
+      document.getElementById("word-pos").textContent = card.pos;
+      const badgeEl = document.getElementById("card-status-badge");
+      if (card.status === "new") {
+        badgeEl.textContent = "新規カード";
         badgeEl.className = "text-xs px-2.5 py-0.5 rounded font-medium bg-sky-950 text-sky-300 border border-sky-800";
-} else if (card.status === "learning") {
-badgeEl.textContent = "学習中 (再確認)";
-        badgeEl.className = "text-xs px-2 py-0.5 rounded bg-red-950 text-red-300 border border-red-800";
+      } else if (card.status === "learning") {
+        badgeEl.textContent = "学習中 (再確認)";
         badgeEl.className = "text-xs px-2.5 py-0.5 rounded font-medium bg-rose-950 text-rose-300 border border-rose-800";
-} else {
-badgeEl.textContent = `復習 (前回間隔: ${card.interval}日)`;
-        badgeEl.className = "text-xs px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800";
+      } else {
+        badgeEl.textContent = `復習 (前回間隔: ${card.interval}日)`;
         badgeEl.className = "text-xs px-2.5 py-0.5 rounded font-medium bg-emerald-950 text-emerald-300 border border-emerald-800";
-}
+      }
 
-document.getElementById("word-text").textContent = card.word;
-document.getElementById("word-phonetic").textContent = card.phonetic;
-document.getElementById("sentence-en").innerHTML = card.sentenceEn;
+      document.getElementById("word-text").textContent = card.word;
+      document.getElementById("word-phonetic").textContent = card.phonetic;
+      document.getElementById("sentence-en").innerHTML = card.sentenceEn;
 
-      // 裏面のデータをセット（初期状態は非表示）
-document.getElementById("word-meaning").textContent = card.meaning;
-document.getElementById("sentence-ja").innerHTML = card.sentenceJa;
-document.getElementById("etymology-note").textContent = card.etymologyNote;
-document.getElementById("family-root-name").textContent = `${card.rootKey} (${card.rootMeaning})`;
+      document.getElementById("word-meaning").textContent = card.meaning;
+      document.getElementById("sentence-ja").innerHTML = card.sentenceJa;
+      document.getElementById("etymology-note").textContent = card.etymologyNote;
+      document.getElementById("family-root-name").textContent = `${card.rootKey} (${card.rootMeaning})`;
 
-      // 語源パーツのブロック生成
-const partsContainer = document.getElementById("etymology-parts");
-partsContainer.innerHTML = "";
-card.parts.forEach((p, idx) => {
-        // 色分けスタイル
-        let colorClass = "bg-amber-950/90 border-amber-600 text-amber-200"; // root
+      const partsContainer = document.getElementById("etymology-parts");
+      partsContainer.innerHTML = "";
+      card.parts.forEach((p, idx) => {
         let colorClass = "bg-amber-900/80 border-amber-500 text-amber-100";
-let typeLabel = "語根";
-if (p.type === "prefix") {
-          colorClass = "bg-sky-950/90 border-sky-600 text-sky-200";
+        let typeLabel = "語根";
+        if (p.type === "prefix") {
           colorClass = "bg-sky-900/80 border-sky-500 text-sky-100";
-typeLabel = "接頭辞";
-} else if (p.type === "suffix") {
-          colorClass = "bg-purple-950/90 border-purple-600 text-purple-200";
+          typeLabel = "接頭辞";
+        } else if (p.type === "suffix") {
           colorClass = "bg-purple-900/80 border-purple-500 text-purple-100";
-typeLabel = "接尾辞";
-}
+          typeLabel = "接尾辞";
+        }
 
-const block = document.createElement("div");
-        block.className = `px-3 py-2 rounded-lg border ${colorClass} flex flex-col items-center min-w-[95px]`;
+        const block = document.createElement("div");
         block.className = `px-3 py-1.5 rounded-lg border ${colorClass} flex flex-col items-center min-w-[90px]`;
-block.innerHTML = `
-          <span class="text-[10px] opacity-75 mb-0.5">${typeLabel}</span>
-          <span class="text-base font-extrabold font-mono">${p.text}</span>
-          <span class="text-xs mt-0.5">${p.meaning}</span>
+        block.innerHTML = `
           <span class="text-[10px] opacity-80">${typeLabel}</span>
           <span class="text-sm font-extrabold font-mono">${p.text}</span>
           <span class="text-[11px] mt-0.5">${p.meaning}</span>
-       `;
-partsContainer.appendChild(block);
+        `;
+        partsContainer.appendChild(block);
 
-if (idx < card.parts.length - 1) {
-const plus = document.createElement("span");
-          plus.className = "text-neutral-500 font-bold text-lg";
+        if (idx < card.parts.length - 1) {
+          const plus = document.createElement("span");
           plus.className = "text-neutral-400 font-bold text-base";
-plus.textContent = "+";
-partsContainer.appendChild(plus);
-}
-});
+          plus.textContent = "+";
+          partsContainer.appendChild(plus);
+        }
+      });
 
-      // 同じ語根のファミリー単語一覧を生成
-const relatedContainer = document.getElementById("related-words");
-relatedContainer.innerHTML = "";
-cards.filter(c => c.rootKey === card.rootKey).forEach(relCard => {
-const isCurrent = relCard.id === card.id;
-const btn = document.createElement("button");
-btn.className = isCurrent
-          ? "text-xs px-2.5 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500 text-amber-200 font-bold"
-          : "text-xs px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-300 transition";
-        btn.innerHTML = `<span class="font-bold">${relCard.word}</span> <span class=" opacity-75">(${relCard.meaning.split("、")[0]})</span>`;
+      const relatedContainer = document.getElementById("related-words");
+      relatedContainer.innerHTML = "";
+      cards.filter(c => c.rootKey === card.rootKey).forEach(relCard => {
+        const isCurrent = relCard.id === card.id;
+        const btn = document.createElement("button");
+        btn.className = isCurrent
           ? "text-xs px-2.5 py-1.5 rounded-lg bg-amber-500/30 border border-amber-400 text-amber-100 font-bold"
           : "text-xs px-2.5 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 text-neutral-200 transition";
         btn.innerHTML = `<span class="font-bold">${relCard.word}</span> <span class="opacity-80">(${relCard.meaning.split("、")[0]})</span>`;
-btn.onclick = () => {
-currentIndex = cards.findIndex(c => c.id === relCard.id);
+        btn.onclick = () => {
+          currentIndex = cards.findIndex(c => c.id === relCard.id);
           saveProgress();
-renderCard();
-};
-relatedContainer.appendChild(btn);
-});
+          renderCard();
+        };
+        relatedContainer.appendChild(btn);
+      });
 
-      // デバッグ用パラメータ表示
-      document.getElementById("debug-params").textContent =
-        `Interval: ${card.interval}d | Ease: ${card.easeFactor.toFixed(2)} | Reps: ${card.repetitions}`;
-
-      // 4段階ボタンの予測日数を更新
-for (let g = 1; g <= 4; g++) {
-const sim = simulateNextInterval(card, g);
-document.getElementById(`interval-${g}`).textContent = sim.label;
-}
-
-      // 裏面を隠して「解答を表示」ボタンに戻す
-document.getElementById("answer-section").classList.add("hidden");
-document.getElementById("btn-show-answer").classList.remove("hidden");
-document.getElementById("grade-buttons").classList.add("hidden");
-document.getElementById("card-content").scrollTop = 0;
-}
-
-    // --- 4. ユーザー操作イベント ---
-function showAnswer() {
-document.getElementById("answer-section").classList.remove("hidden");
-document.getElementById("btn-show-answer").classList.add("hidden");
-@@ -480,21 +439,13 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-const card = cards[currentIndex];
-const result = simulateNextInterval(card, grade);
-
-      // カードの状態を更新
-card.interval = result.interval;
-card.repetitions = result.repetitions;
-card.easeFactor = result.easeFactor;
-card.status = result.nextStatus;
-
-      // 語根シナジーの更新 (普通・簡単なら語根ボーナスUP、もう一度なら少しDOWN)
-      if (grade >= 3) {
-        rootMastery[card.rootKey] = Math.min(0.5, (rootMastery[card.rootKey] || 0) + 0.08);
-      } else if (grade === 1) {
-        rootMastery[card.rootKey] = Math.max(0.0, (rootMastery[card.rootKey] || 0) - 0.05);
+      for (let g = 1; g <= 4; g++) {
+        const sim = simulateNextInterval(card, g);
+        document.getElementById(`interval-${g}`).textContent = sim.label;
       }
 
-      // 次のカードへ移動
-currentIndex = (currentIndex + 1) % cards.length;
+      document.getElementById("answer-section").classList.add("hidden");
+      document.getElementById("btn-show-answer").classList.remove("hidden");
+      document.getElementById("grade-buttons").classList.add("hidden");
+      document.getElementById("card-content").scrollTop = 0;
+    }
+
+    function showAnswer() {
+      document.getElementById("answer-section").classList.remove("hidden");
+      document.getElementById("btn-show-answer").classList.add("hidden");
+      document.getElementById("grade-buttons").classList.remove("hidden");
+    }
+
+    function submitGrade(grade) {
+      const card = cards[currentIndex];
+      const result = simulateNextInterval(card, grade);
+
+      card.interval = result.interval;
+      card.repetitions = result.repetitions;
+      card.easeFactor = result.easeFactor;
+      card.status = result.nextStatus;
+
+      currentIndex = (currentIndex + 1) % cards.length;
       saveProgress();
-renderCard();
-}
+      renderCard();
+    }
 
-@@ -508,26 +459,12 @@ <h2 id="word-meaning" class="text-2xl font-bold text-emerald-400">
-}
+    function speakWord() {
+      const card = cards[currentIndex];
+      if ('speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance(card.word);
+        utter.lang = 'en-US';
+        window.speechSynthesis.speak(utter);
+      }
+    }
 
-function resetAll() {
-      cards = JSON.parse(JSON.stringify(initialCards));
-      rootMastery = { spect: 0.0, tract: 0.0 };
-      currentIndex = 0;
+    function resetAll() {
       localStorage.removeItem(STORAGE_KEY);
       loadProgress();
-renderCard();
-}
+      renderCard();
+    }
 
-    // キーボードショートカット対応 (Anki PC版 / AnkiDroid外付けキーボード互換)
-    window.addEventListener("keydown", (e) => {
-      const isAnswerHidden = document.getElementById("answer-section").classList.contains("hidden");
-      if (e.code === "Space" || e.code === "Enter") {
-        e.preventDefault();
-        if (isAnswerHidden) showAnswer();
-        else submitGrade(3); // スペース連打で「普通(Good)」
-      } else if (!isAnswerHidden && ["Digit1", "Digit2", "Digit3", "Digit4"].includes(e.code)) {
-        const grade = parseInt(e.code.replace("Digit", ""), 10);
-        submitGrade(grade);
-      }
-    });
-
-    // 初期表示
     loadProgress();
-renderCard();
-</script>
+    renderCard();
+  </script>
 </body>
+</html>
